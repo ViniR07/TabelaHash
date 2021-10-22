@@ -40,83 +40,6 @@ void flush_in() {
     } while (ch != EOF && ch != '\n');
 }
 
-// Procura produto no Hash dado a chave e imprime na tela
-// Retorna 1 se achou e 0 se não achou
-int procura_produto(int tamanho, int chave){
-    int j, i;
-    for(i = 0; i < tamanho; i++){
-        if(tab[i].chave == chave){
-            j = i;
-            break;
-        }
-    }
-    if(i < tamanho){
-        printf("Produto: %s\n\n", tab[j].nome);
-        return 1;
-    }
-    return 0;
-}
-
-// Consulta preço de produto no Hash e imprime na tela
-// Retorna 1 se achou e 0 se não achou
-int consulta_preco(int tamanho, char str[]){
-    int j, i;
-    for(i = 0; i < tamanho; i++){
-        if(strcmp(tab[i].nome, str) == 0){
-            j = i;
-            break;
-        }
-    }
-    if(i < tamanho){
-        printf("O preco do produto %s eh R$ %.2f\n\n", tab[j].nome, tab[j].valor);
-        return 1;
-    }
-    return 0;
-}
-
-// Retorna um indice Hash para o produto entrado
-int hash(int ch, int tamanho){
-    return ch % tamanho;
-}
-
-// Insere o produto em um compartimento (registro) vazio do Hash criado
-// Atribui valores de preco, nome e chave (cada produto contem uma chave diferente)
-void contabiliza (int ch, char str[], float preco, int tamanho) {
-   int c, sonda, Nhash;
-   Nhash = hash (ch, tamanho);
-    for (sonda = 0; sonda < tamanho; sonda++) {
-        c = tab[Nhash].chave;
-        if (c == -1 || c == ch) break; 
-        Nhash = (Nhash + 1) % tamanho;
-    }
-    if (sonda >= tamanho) 
-        exit (EXIT_FAILURE);
-    if (c == -1) 
-        tab[Nhash].chave = ch;
-    tab[Nhash].ocorr++;
-    tab[Nhash].valor = preco;
-    strcpy(tab[Nhash].nome, str);
-}   
-
-// Retorna o valor da string dado uma formula
-int valor_string(char* str){
-    int i, valor = 0;
-    int tam = strlen(str);
-    for(i = 0; i < tam; i++){
-        valor = (31 + valor) * (int)str[i];
-    }
-    return (valor & 0x7FFFFFFF); // Operador and bit-a-bit para "retirar" possíveis sinais
-}
-
-// Escreve a tabela Hash completa no monitor 
-void escreve_hash(int tamanho_tabela){
-    printf("\n/*******************>Tabela Hash<******************/\n");
-    for(int i = 0; i < tamanho_tabela; i++){
-        printf("#0%d Produto = %s Preco = %.2f Chave = %d Ocorrencia = %d\n", i, tab[i].nome, tab[i].valor, tab[i].chave, tab[i].ocorr);
-    }
-    printf("\n");
-}
-
 // Limpa o Hash e faz atribuicoes necessárias para o cálculo
 void limpa_hash(int tamanho_tabela){
     for(int i = 0; i < tamanho_tabela; i++){
@@ -143,6 +66,49 @@ void insere_hash(int tamanho_tabela){
 
         contabiliza(valor_string(nome_produto), nome_produto, preco, tamanho_tabela);   
     }
+}
+
+// Retorna o valor da string dado uma formula
+int valor_string(char* str){
+    int i, valor = 0;
+    int tam = strlen(str);
+    for(i = 0; i < tam; i++){
+        valor = (31 + valor) * (int)str[i];
+    }
+    return (valor & 0x7FFFFFFF); // Operador and bit-a-bit para "retirar" possíveis sinais
+}
+
+// Insere o produto em um compartimento (registro) vazio do Hash criado
+// Atribui valores de preco, nome e chave (cada produto contem uma chave diferente)
+void contabiliza (int ch, char str[], float preco, int tamanho) {
+   int c, sonda, Nhash;
+   Nhash = hash (ch, tamanho);
+    for (sonda = 0; sonda < tamanho; sonda++) {
+        c = tab[Nhash].chave;
+        if (c == -1 || c == ch) break; 
+        Nhash = (Nhash + 1) % tamanho;
+    }
+    if (sonda >= tamanho) 
+        exit (EXIT_FAILURE);
+    if (c == -1) 
+        tab[Nhash].chave = ch;
+    tab[Nhash].ocorr++;
+    tab[Nhash].valor = preco;
+    strcpy(tab[Nhash].nome, str);
+}   
+
+// Retorna um indice Hash para o produto entrado
+int hash(int ch, int tamanho){
+    return ch % tamanho;
+}
+
+// Escreve a tabela Hash completa no monitor 
+void escreve_hash(int tamanho_tabela){
+    printf("\n/*******************>Tabela Hash<******************/\n");
+    for(int i = 0; i < tamanho_tabela; i++){
+        printf("#0%d Produto = %s Preco = %.2f Chave = %d Ocorrencia = %d\n", i, tab[i].nome, tab[i].valor, tab[i].chave, tab[i].ocorr);
+    }
+    printf("\n");
 }
 
 // Consulta o Hash de diversas formas a escolher pelo usuário
@@ -180,3 +146,36 @@ void consulta_hash(int tamanho_tabela){
     } while(consulta);
 }
 
+// Procura produto no Hash dado a chave e imprime na tela
+// Retorna 1 se achou e 0 se não achou
+int procura_produto(int tamanho, int chave){
+    int j, i;
+    for(i = 0; i < tamanho; i++){
+        if(tab[i].chave == chave){
+            j = i;
+            break;
+        }
+    }
+    if(i < tamanho){
+        printf("Produto: %s\n\n", tab[j].nome);
+        return 1;
+    }
+    return 0;
+}
+
+// Consulta preço de produto no Hash e imprime na tela
+// Retorna 1 se achou e 0 se não achou
+int consulta_preco(int tamanho, char str[]){
+    int j, i;
+    for(i = 0; i < tamanho; i++){
+        if(strcmp(tab[i].nome, str) == 0){
+            j = i;
+            break;
+        }
+    }
+    if(i < tamanho){
+        printf("O preco do produto %s eh R$ %.2f\n\n", tab[j].nome, tab[j].valor);
+        return 1;
+    }
+    return 0;
+}
